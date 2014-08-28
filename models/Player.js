@@ -1,8 +1,7 @@
 var db = require(__dirname + '/../lib/db');
-var Player = require(__dirname + '/Player.js');
 
-var gameSchema = db.Schema({
-	players: [Player],
+var playerSchema = db.Schema({
+	session_id: String,
 	created_at: {
 		type: Date,
 		default: Date.now
@@ -14,6 +13,6 @@ var gameSchema = db.Schema({
 	deleted_at: Date
 });
 
-var Game = db.model('Game', gameSchema);
+var Player = db.model('Player', playerSchema);
 
-module.exports = Game;
+module.exports = Player;

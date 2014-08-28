@@ -1,8 +1,12 @@
+var socket = require('socket.io');
 var express = require('express');
+var http = require('http');
+
 var app = express();
-var server = require('http').Server(app);
-var io = require('socket.io')(server);
+var server = http.createServer(app);
+var io = socket.listen(server);
 var path = require('path');
+var config = require('config');
 
 var logger = require(__dirname + '/lib/logger');
 var db = require(__dirname + '/lib/db');
@@ -11,19 +15,24 @@ var Game = require(__dirname + '/models/Game');
 /**
  * Express
  */
-app.set('port', process.env.PORT || 8080);
+app.set('port', config.get('port'));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 app.use(express.static('public'));
 
-app.get('/', function (req, res){
+/**
+ * Routes
+ */
+app.get('/', function (req, res) {
+	console.log(req.session);
+
 	res.render(app.get('views') + '/index.jade', {
 		pageTitle: "Risk"
 	});
 });
 
-app.get('/new', function (req, res){
+app.get('/new', function (req, res) {
 	Game.create({}, function(err, game) {
 		if (err) {
 			throw err;
@@ -35,7 +44,7 @@ app.get('/new', function (req, res){
 	});
 });
 
-app.get('/game/:id', function (req, res){
+app.get('/game/:id', function (req, res) {
 	var game = Game.findOne({
 		_id: req.params.id
 	}).exec(function(err, game) {
@@ -46,7 +55,6 @@ app.get('/game/:id', function (req, res){
 			return;
 		}
 
-		console.log(game.id);
 		res.send(game);
 	});
 });
@@ -55,6 +63,8 @@ app.get('/game/:id', function (req, res){
  * Socket.io
  */
 io.on('connection', function (socket) {
+	logger.debug("User connected to socket.io");
+
 	socket.emit('news', {
 		hello: 'world'
 	});
@@ -67,6 +77,6 @@ io.on('connection', function (socket) {
 /**
  * Start webserver
  */
-app.listen(app.get('port'), function() {
-	console.log('Express server listening on port ' + app.get('port'));
+server.listen(app.get('port'), function() {
+	logger.info('Server started and listening on port ' + app.get('port'));
 });
