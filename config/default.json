@@ -1,5 +1,6 @@
 {
 	"port": 8080,
-	"db": "mongodb://host/dbname",
-	"secret": "njdah891hdon1odLNHLANTGLAGASGnou51h1n"
+	"db": "mongodb://username:password@host:port/dbname?options",
+	"secret": "njdah891hdon1odLNHLANTGLAGASGnou51h1n",
+	"debug": false
 }
